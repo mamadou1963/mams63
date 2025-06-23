@@ -229,3 +229,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Created complete invoice management application with French interface. Backend includes full CRUD for clients and invoices with automatic calculations. Frontend has modern UI with dashboard, client management, and invoice creation/editing. Need to test all backend endpoints first."
+  - agent: "testing"
+    message: "Completed testing of all backend API endpoints. Fixed MongoDB compatibility issue with date objects by converting date to datetime in the invoice creation and update functions. Also fixed the calculate_invoice_totals function to handle both InvoiceItem objects and dictionaries. All backend APIs are now working correctly. Client Management API, Invoice Management API, and Dashboard Statistics API all pass their tests."
