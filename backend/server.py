@@ -230,6 +230,10 @@ async def update_invoice(invoice_id: str, invoice_update: InvoiceUpdate):
     if not update_data:
         raise HTTPException(status_code=400, detail="Aucune donnée à mettre à jour")
     
+    # Convert date objects to datetime for MongoDB compatibility
+    if update_data.get("date_echeance") and isinstance(update_data["date_echeance"], date):
+        update_data["date_echeance"] = datetime.combine(update_data["date_echeance"], datetime.min.time())
+    
     # If items are updated, recalculate totals
     if "items" in update_data:
         taux_tva = update_data.get("taux_tva", 20.0)
