@@ -197,8 +197,19 @@ async def create_invoice(invoice: InvoiceCreate):
     invoice_dict["montant_tva"] = montant_tva
     invoice_dict["total"] = total
     
+    # Convert date objects to datetime for MongoDB compatibility
+    if invoice_dict.get("date_echeance") and isinstance(invoice_dict["date_echeance"], date):
+        invoice_dict["date_echeance"] = datetime.combine(invoice_dict["date_echeance"], datetime.min.time())
+    
     invoice_obj = Invoice(**invoice_dict)
-    await db.invoices.insert_one(invoice_obj.dict())
+    # Convert to dict and handle date objects for MongoDB
+    invoice_data = invoice_obj.dict()
+    if isinstance(invoice_data.get("date_echeance"), date):
+        invoice_data["date_echeance"] = datetime.combine(invoice_data["date_echeance"], datetime.min.time())
+    if isinstance(invoice_data.get("date_creation"), date):
+        invoice_data["date_creation"] = datetime.combine(invoice_data["date_creation"], datetime.min.time())
+    
+    await db.invoices.insert_one(invoice_data)
     return invoice_obj
 
 @api_router.get("/invoices", response_model=List[Invoice])
