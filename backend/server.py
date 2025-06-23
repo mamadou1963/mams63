@@ -118,13 +118,26 @@ async def get_next_invoice_number():
 
 def calculate_invoice_totals(items: List[InvoiceItem], taux_tva: float):
     """Calculate invoice totals"""
-    sous_total = sum(item.quantite * item.prix_unitaire for item in items)
+    # Convert dict items to InvoiceItem objects if needed
+    item_objects = []
+    for item in items:
+        if isinstance(item, dict):
+            item_objects.append(InvoiceItem(**item))
+        else:
+            item_objects.append(item)
+    
+    sous_total = sum(item.quantite * item.prix_unitaire for item in item_objects)
     montant_tva = sous_total * (taux_tva / 100)
     total = sous_total + montant_tva
     
     # Update item totals
-    for item in items:
+    for item in item_objects:
         item.total = item.quantite * item.prix_unitaire
+    
+    # Update original items if they were dictionaries
+    for i, item in enumerate(items):
+        if isinstance(item, dict):
+            items[i]["total"] = item_objects[i].total
     
     return sous_total, montant_tva, total
 
